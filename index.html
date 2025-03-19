@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<style>
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body{
+        font-family: Arial, Helvetica, sans-serif;
+        background-color: #f0f8ff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .stopwatch{
+        background-color: #fff;
+        width: 350px;
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+     
+
+    .stopwatch h1{
+        font-size: 3em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .time-display{
+        font-size: 48px;
+        color: #ff6347;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .button-container{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+    button{
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+
+    button:hover{
+        background-color: #45a049;
+    }
+
+    .lap-button{
+        background-color: #008CBA;
+    }
+
+    .lap-button:hover {
+        background-color: #007B9A;
+    }
+
+    .stop-button{
+        background-color: #f44336;
+    }
+
+    .stop-button:hover{
+      background-color: #e53935;
+    }
+
+    .start-button{
+        background-color: #4CAF50;
+    }
+    
+    .stop-button:hover{
+        background-color: #45a049;
+    }
+
+    .lap-list{
+        list-style-type: none;
+        padding: 0;
+        text-align: left;
+        margin-top: 30px;
+    }
+
+    .lap-list li{
+        background-color: #f2f2f2;
+        margin: 5px 0;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+     
+     @media(max-width:600px){
+        .stopwatch{
+            width:90%;
+            padding: 20px;
+        }
+        .time-display{
+            font-size: 36px;
+        }
+
+        button{
+            padding: 12px 24px;
+            font-size: 16px;
+        }
+     }
+</style>
+<body>
+    <div class="stopwatch">
+        <h1>Stopwatch</h1>
+        <div class="time-display" id="time-display">00:00:00</div>
+
+        <div class="button-container">
+            <button id="start-stop" class="start-button"> Start</button>
+            <button id="lap" class="lap-button">Lap</button>
+            <button id="reset" class="stop-button">Stop</button>
+        </div>
+
+        <ul class="lap-list" id="lap-list"></ul>
+    </div>
+
+
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timeInterval;
+        let running = false;
+        let lapCount = 1;
+        
+        const timeDisplay = document.getElementById('time-display');
+        const startStopButton = document.getElementById('start-stop');
+        const lapButton = document.getElementById('lap');
+        const resetButton = document.getElementById('reset');
+        const lapList = document.getElementById('lap-list');
+
+
+        function formatTime (timeInMillis){
+            let hours = Math.floor (timeInMillis /3600000);
+            let minutes =  Math.floor ((timeInMillis %3600000)/60000);
+            let seconds =  Math.floor ((timeInMillis %60000) / 1000);
+            return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+        }
+
+        function pad(number){
+
+            return number<10 ? '0' + number:number;
+        }
+
+        function updateTime(){
+            elapsedTime=Date.now()-startTime;
+            timeDisplay.innerText=formatTime(elapsedTime);
+        }
+
+           function startStop(){
+            if(running){
+                clearInterval(timeInterval);
+                running=false;
+                startStopButton.innerText='Start';
+                startStopButton.classList.remove('stop-button');
+                startStopButton.classList.add('start-button');
+            } else{
+                startTime = Date.now() - elapsedTime;
+                timeInterval =setInterval(updateTime,1000);
+                running=true;
+                startStopButton.innerText='Stop';
+                startStopButton.classList.remove('start-button');
+                startStopButton.classList.add('stop-button');
+            }
+        }
+
+           
+
+            function lap(){
+                  if(running){
+                    const lapTime = formatTime(elapsedTime);
+                    const lapItem = document.createElement('li');
+                    lapItem.innerText=`Lap ${lapCount}: ${lapTime}`;
+                    lapList.appendChild(lapItem);
+                    lapcount++;
+                }
+            }
+
+            function reset(){
+                clearInterval(timeInterval);
+                running=false;
+                elapsedTime=0;
+                lapCount=1;
+                timeDisplay.innerText = formatTime(elapsedTime);
+                lapList.innerHTML='';
+                startStopButton.innerText ='Start';
+                startStopButton.classList.remove('stop-button');
+                startStopButton.classList.add('start-button');
+            }
+         
+        startStopButton.addEventListener('click',startStop);
+            lapButton.addEventListener('click',lap);
+            resetButton.addEventListener('click',reset);
+
+
+    </script>
+</body>
+</html>
